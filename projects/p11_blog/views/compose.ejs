@@ -1,0 +1,15 @@
+<%- include('partials/header'); -%>
+<h1>Compose</h1>
+<!-- Button type is submit so it will submit everything in the form -->
+<!-- Post to the /compose route -->
+<!-- Button is outside of the div containing the form inputs -->
+<form class="" action="/compose" method="post">
+    <div class="form-group">
+        <label for="">Title</label>
+        <input class="form-control" type="text" name="postTitle">
+        <label for="">Post</label>
+        <textarea class="form-control" name="postBody" id="" cols="30" rows="5"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" name="button">Publish</button>
+</form>
+<%- include('partials/footer'); -%>
