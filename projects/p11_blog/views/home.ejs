@@ -9,8 +9,8 @@
 <!-- Console log the title in the posts array-->
     <% posts.forEach(function(post){ %>
         <h1> <%=post.title%> </h1>
-        <p> <%=post.content.substring(0,100) + "..."%> </p>
-        <a href="/posts/<%=post.title%>">Read More</a>
+        <p> <%=post.content.substring(0,200) + "..."%> </p>
+        <a href="/posts/<%=post._id%>">Read More</a>
     <% }) %>
 
 
