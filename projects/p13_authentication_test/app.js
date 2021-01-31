@@ -4,8 +4,8 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 require('dotenv').config();
-const md5 = require("md5");
-
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 const app = express();
 
@@ -40,19 +40,21 @@ app.get("/login", function(req,res){
 
 // Take the post request from the form on the login page
 // If the email field matches with the username field
-app.post("/login", function(req,res){
+app.post("/login", function (req, res) {
     const username = req.body.username;
-    const password = md5(req.body.password);
+    const password = req.body.password;
 
-    // Find a user based on email, if the email exists, compare the password entered, if it matches, render the secrets page
-    User.findOne({email: username}, function(err, foundUser){
-        if (err){
+    // Find a user based on email, if the email exists, compare the hashed password entered, if it matches, render the secrets page
+    User.findOne({ email: username }, function (err, foundUser) {
+        if (err) {
             console.log(err);
         } else {
-            if (foundUser){
-                if (foundUser.password === password) {
-                    res.render("secrets");
-                }
+            if (foundUser) {
+                bcrypt.compare(password, foundUser.password, function (err, result) {
+                    if (result === true) {
+                        res.render("secrets");
+                    }
+                });
             }
         }
     });
@@ -65,23 +67,26 @@ app.get("/register", function(req,res){
 
 // Take the post request from the form on the register page
 // Body parser takes the input from name=userName and name=password
-// Use md5 to turn the password into an irreverisble hash
+// Use bcrypt to hash and salt the password
 app.post("/register", function(req,res){
-    const newUser = new User({
-        email: req.body.username,
-        password: md5(req.body.password)
-    });
-
-    // Save the newUser and if there's no error, render the secrets page
-    newUser.save(function(err){
-        if (err) {
-            console.log(err);
-        } else {
-            res.render("secrets");
-        }
+    
+    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+        // Store hash in your password DB.
+        const newUser = new User({
+            email: req.body.username,
+            password: hash            
+        });
+    
+        // Save the newUser and if there's no error, render the secrets page
+        newUser.save(function(err){
+            if (err) {
+                console.log(err);
+            } else {
+                res.render("secrets");
+            }
+        });
     });
 });
-
 
 
 app.listen(3000, function(){
