@@ -3,8 +3,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
 require('dotenv').config();
+const md5 = require("md5");
+
 
 const app = express();
 
@@ -22,12 +23,6 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String
 });
-
-
-// Must add the plugin before we create the mongoose model
-// Only encrypt the password field and not the email field to allow for efficient searching of users when logging in
-// Will encrypt when save is called.  Will decrypt when find is called
-userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ["password"] });
 
 // Set up a new user model
 // Name of the collection = User is created using the userSchema
@@ -47,7 +42,7 @@ app.get("/login", function(req,res){
 // If the email field matches with the username field
 app.post("/login", function(req,res){
     const username = req.body.username;
-    const password = req.body.password;
+    const password = md5(req.body.password);
 
     // Find a user based on email, if the email exists, compare the password entered, if it matches, render the secrets page
     User.findOne({email: username}, function(err, foundUser){
@@ -70,10 +65,11 @@ app.get("/register", function(req,res){
 
 // Take the post request from the form on the register page
 // Body parser takes the input from name=userName and name=password
+// Use md5 to turn the password into an irreverisble hash
 app.post("/register", function(req,res){
     const newUser = new User({
         email: req.body.username,
-        password: req.body.password
+        password: md5(req.body.password)
     });
 
     // Save the newUser and if there's no error, render the secrets page
