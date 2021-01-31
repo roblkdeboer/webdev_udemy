@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const encrypt = require("mongoose-encryption");
+require('dotenv').config();
 
 const app = express();
 
@@ -22,13 +23,11 @@ const userSchema = new mongoose.Schema({
     password: String
 });
 
-// Define a secret key
-const secret = "Thisisourlittlesecret.'";
 
 // Must add the plugin before we create the mongoose model
 // Only encrypt the password field and not the email field to allow for efficient searching of users when logging in
 // Will encrypt when save is called.  Will decrypt when find is called
-userSchema.plugin(encrypt, {secret: secret, encryptedFields: ["password"] });
+userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ["password"] });
 
 // Set up a new user model
 // Name of the collection = User is created using the userSchema
