@@ -22,7 +22,7 @@ function App() {
   function deleteNote(id) {
     setNotes(prevNotes => {
       // Filter and create an array of notes aside from the notes where the ID matches the one that has been clicked on to be deleted
-      return prevNotes.filter((noteItem, index) => {
+      return  prevNotes.filter((noteItem, index) => {
         return index !== id;
       });
     });
